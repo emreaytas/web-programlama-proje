@@ -1,0 +1,6 @@
+@webprogbackend_HostAddress = http://localhost:5029
+
+GET {{webprogbackend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
