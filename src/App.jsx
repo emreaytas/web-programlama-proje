@@ -1,11 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
-import AdminPage from './pages/AdminPage';
+import AdminPage from "./pages/AdminPage";
 
-function AppContent() {
-  const location = useLocation();
-  const hideNavbar = location.pathname.startsWith("/admin");
 
   return (
     <>

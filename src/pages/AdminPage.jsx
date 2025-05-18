@@ -80,7 +80,6 @@ const AdminPage = () => {
                 <button className="btn btn-sm btn-danger" onClick={() => handleDelete(p.id)}>
                   Sil
                 </button>
-                {/* Düzenleme butonu burada geliştirilebilir */}
               </td>
             </tr>
           ))}
