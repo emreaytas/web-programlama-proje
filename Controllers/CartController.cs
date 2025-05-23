@@ -19,11 +19,21 @@ namespace webprogbackend.Controllers
             _context = context;
         }
 
+        private int? GetUserId()
+        {
+            var idStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (int.TryParse(idStr, out int id))
+                return id;
+            return null;
+        }
+
         // GET: api/Cart
         [HttpGet]
         public async Task<ActionResult<Cart>> GetCart()
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var userId = GetUserId();
+            if (userId == null) return Unauthorized();
+
             var cart = await _context.Carts
                 .Include(c => c.CartItems)
                 .ThenInclude(ci => ci.Product)
@@ -31,7 +41,7 @@ namespace webprogbackend.Controllers
 
             if (cart == null)
             {
-                cart = new Cart { UserId = userId };
+                cart = new Cart { UserId = userId.Value };
                 _context.Carts.Add(cart);
                 await _context.SaveChangesAsync();
             }
@@ -43,7 +53,9 @@ namespace webprogbackend.Controllers
         [HttpGet("Summary")]
         public async Task<ActionResult<object>> GetCartSummary()
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var userId = GetUserId();
+            if (userId == null) return Unauthorized();
+
             var cart = await _context.Carts
                 .Include(c => c.CartItems)
                 .ThenInclude(ci => ci.Product)
@@ -85,14 +97,16 @@ namespace webprogbackend.Controllers
                 return BadRequest(ModelState);
             }
 
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var userId = GetUserId();
+            if (userId == null) return Unauthorized();
+
             var cart = await _context.Carts
                 .Include(c => c.CartItems)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
 
             if (cart == null)
             {
-                cart = new Cart { UserId = userId };
+                cart = new Cart { UserId = userId.Value };
                 _context.Carts.Add(cart);
             }
 
@@ -132,7 +146,9 @@ namespace webprogbackend.Controllers
                 return BadRequest(ModelState);
             }
 
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var userId = GetUserId();
+            if (userId == null) return Unauthorized();
+
             var cart = await _context.Carts
                 .Include(c => c.CartItems)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
@@ -157,7 +173,9 @@ namespace webprogbackend.Controllers
         [HttpDelete("RemoveItem/{productId}")]
         public async Task<IActionResult> RemoveFromCart(int productId)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var userId = GetUserId();
+            if (userId == null) return Unauthorized();
+
             var cart = await _context.Carts
                 .Include(c => c.CartItems)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
@@ -178,7 +196,9 @@ namespace webprogbackend.Controllers
         [HttpDelete("Clear")]
         public async Task<IActionResult> ClearCart()
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var userId = GetUserId();
+            if (userId == null) return Unauthorized();
+
             var cart = await _context.Carts
                 .Include(c => c.CartItems)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
@@ -195,7 +215,9 @@ namespace webprogbackend.Controllers
         [HttpGet("Checkout")]
         public async Task<ActionResult<object>> GetCheckoutInfo()
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var userId = GetUserId();
+            if (userId == null) return Unauthorized();
+
             var cart = await _context.Carts
                 .Include(c => c.CartItems)
                 .ThenInclude(ci => ci.Product)
@@ -221,6 +243,176 @@ namespace webprogbackend.Controllers
 
             return checkoutInfo;
         }
+
+        // GET: api/Cart/ItemsSimple
+        [HttpGet("ItemsSimple")]
+        public async Task<ActionResult<IEnumerable<object>>> GetCartItemsSimple()
+        {
+            var userId = GetUserId();
+            if (userId == null) return Unauthorized();
+
+            var cart = await _context.Carts
+                .Include(c => c.CartItems)
+                .ThenInclude(ci => ci.Product)
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+
+            if (cart == null || !cart.CartItems.Any())
+                return new List<object>();
+
+            var items = cart.CartItems.Select(ci => new
+            {
+                ci.ProductId,
+                ci.Quantity
+            });
+            return Ok(items);
+        }
+
+        // GET: api/Cart/TotalWeight
+        [HttpGet("TotalWeight")]
+        public async Task<ActionResult<decimal>> GetCartTotalWeight()
+        {
+            var userId = GetUserId();
+            if (userId == null) return Unauthorized();
+
+            var cart = await _context.Carts
+                .Include(c => c.CartItems)
+                .ThenInclude(ci => ci.Product)
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+
+            if (cart == null || !cart.CartItems.Any())
+                return 0m;
+
+            decimal totalWeight = cart.CartItems.Sum(ci => (ci.Product.Weight ?? 0) * ci.Quantity);
+            return Ok(totalWeight);
+        }
+
+        // POST: api/Cart/AddItemsBulk
+        [HttpPost("AddItemsBulk")]
+        public async Task<IActionResult> AddItemsBulk([FromBody] List<CartItemModel> items)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var userId = GetUserId();
+            if (userId == null) return Unauthorized();
+
+            var cart = await _context.Carts
+                .Include(c => c.CartItems)
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+
+            if (cart == null)
+            {
+                cart = new Cart { UserId = userId.Value };
+                _context.Carts.Add(cart);
+            }
+
+            foreach (var model in items)
+            {
+                var product = await _context.Products.FindAsync(model.ProductId);
+                if (product == null || product.StockQuantity < model.Quantity)
+                    continue;
+
+                var cartItem = cart.CartItems.FirstOrDefault(ci => ci.ProductId == model.ProductId);
+                if (cartItem != null)
+                    cartItem.Quantity += model.Quantity;
+                else
+                    cart.CartItems.Add(new CartItem { CartId = cart.Id, ProductId = model.ProductId, Quantity = model.Quantity });
+            }
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
+        // POST: api/Cart/IncreaseItem/{productId}
+        [HttpPost("IncreaseItem/{productId}")]
+        public async Task<IActionResult> IncreaseCartItem(int productId)
+        {
+            var userId = GetUserId();
+            if (userId == null) return Unauthorized();
+
+            var cart = await _context.Carts
+                .Include(c => c.CartItems)
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+            if (cart == null)
+                return NotFound("Cart not found");
+            var cartItem = cart.CartItems.FirstOrDefault(ci => ci.ProductId == productId);
+            if (cartItem == null)
+                return NotFound("Item not found in cart");
+            var product = await _context.Products.FindAsync(productId);
+            if (product.StockQuantity < cartItem.Quantity + 1)
+                return BadRequest("Not enough stock available");
+            cartItem.Quantity++;
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
+        // POST: api/Cart/DecreaseItem/{productId}
+        [HttpPost("DecreaseItem/{productId}")]
+        public async Task<IActionResult> DecreaseCartItem(int productId)
+        {
+            var userId = GetUserId();
+            if (userId == null) return Unauthorized();
+
+            var cart = await _context.Carts
+                .Include(c => c.CartItems)
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+            if (cart == null)
+                return NotFound("Cart not found");
+            var cartItem = cart.CartItems.FirstOrDefault(ci => ci.ProductId == productId);
+            if (cartItem == null)
+                return NotFound("Item not found in cart");
+            if (cartItem.Quantity <= 1)
+                return BadRequest("Quantity cannot be less than 1");
+            cartItem.Quantity--;
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
+        // GET: api/Cart/Status
+        [HttpGet("Status")]
+        public async Task<ActionResult<object>> GetCartStatus()
+        {
+            var userId = GetUserId();
+            if (userId == null) return Unauthorized();
+
+            var cart = await _context.Carts
+                .Include(c => c.CartItems)
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+            bool isEmpty = cart == null || !cart.CartItems.Any();
+            return Ok(new { IsEmpty = isEmpty });
+        }
+
+        // GET: api/Cart/SummaryWithDiscount?discountCode=KOD
+        [HttpGet("SummaryWithDiscount")]
+        public async Task<ActionResult<object>> GetCartSummaryWithDiscount([FromQuery] string discountCode)
+        {
+            var userId = GetUserId();
+            if (userId == null) return Unauthorized();
+
+            var cart = await _context.Carts
+                .Include(c => c.CartItems)
+                .ThenInclude(ci => ci.Product)
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+
+            if (cart == null)
+            {
+                return new { TotalItems = 0, TotalAmount = 0m, Discount = 0m, FinalAmount = 0m, Items = new List<object>() };
+            }
+
+            decimal total = cart.CartItems.Sum(ci => ci.Product.Price * ci.Quantity);
+            decimal discount = 0m;
+            if (!string.IsNullOrEmpty(discountCode) && discountCode == "KOD")
+                discount = total * 0.10m; // %10 indirim
+            decimal final = total - discount;
+            var items = cart.CartItems.Select(ci => new
+            {
+                ProductId = ci.ProductId,
+                ProductName = ci.Product.Name,
+                Quantity = ci.Quantity,
+                UnitPrice = ci.Product.Price,
+                TotalPrice = ci.Product.Price * ci.Quantity
+            });
+            return Ok(new { TotalItems = cart.CartItems.Sum(ci => ci.Quantity), TotalAmount = total, Discount = discount, FinalAmount = final, Items = items });
+        }
     }
 
     public class CartItemModel
@@ -228,4 +420,4 @@ namespace webprogbackend.Controllers
         public int ProductId { get; set; }
         public int Quantity { get; set; }
     }
-} 
+}
