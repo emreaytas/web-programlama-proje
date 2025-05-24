@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import AdminPage from './pages/AdminPage';
+import LoginPage from "./pages/LoginPage";
 
 function AppContent() {
   const location = useLocation();
@@ -13,6 +14,7 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/admin" element={<AdminPage />} />
+        <Route path="/login" element={<LoginPage />} />
       </Routes>
     </>
   );
