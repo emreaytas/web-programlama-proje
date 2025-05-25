@@ -1,7 +1,9 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
-import AdminPage from "./pages/AdminPage";
+import AdminPage from './pages/AdminPage';
+import LoginPage from "./pages/LoginPage";
+
 
 
   return (
@@ -10,6 +12,7 @@ import AdminPage from "./pages/AdminPage";
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/admin" element={<AdminPage />} />
+        <Route path="/login" element={<LoginPage />} />
       </Routes>
     </>
   );
