@@ -256,7 +256,7 @@ namespace webprogbackend.Controllers
                 .ThenInclude(ci => ci.Product)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
 
-            if (cart == null || !cart.CartItems.Any())
+            if (cart == null || cart.CartItems == null || !cart.CartItems.Any())
                 return new List<object>();
 
             var items = cart.CartItems.Select(ci => new
