@@ -1,21 +1,48 @@
 const TOKEN_KEY = "auth_token";
 
-// Token oluştur (örnek: sahte token)
+/**
+ * Sahte bir token oluşturur.
+ * Gerçek uygulamalarda backend'den alınmalıdır.
+ * @param {string} username
+ * @returns {string}
+ */
 export const generateFakeToken = (username) => {
-  return `FAKE-TOKEN-${username}-${Date.now()}`;
+  const payload = {
+    user: username,
+    timestamp: new Date().toISOString()
+  };
+  return btoa(JSON.stringify(payload)); // base64 ile encode edilmiş sahte JWT
 };
 
-// Token'ı kaydet
+/**
+ * Token'ı localStorage'a kaydeder.
+ * @param {string} token
+ */
 export const saveToken = (token) => {
-  localStorage.setItem(TOKEN_KEY, token);
+  if (typeof token === "string") {
+    localStorage.setItem(TOKEN_KEY, token);
+  }
 };
 
-// Token'ı getir
+/**
+ * localStorage'dan token'ı alır.
+ * @returns {string|null}
+ */
 export const getToken = () => {
   return localStorage.getItem(TOKEN_KEY);
 };
 
-// Token'ı sil
+/**
+ * Token'ı siler.
+ */
 export const clearToken = () => {
   localStorage.removeItem(TOKEN_KEY);
+};
+
+/**
+ * Token var mı kontrolü yapar.
+ * @returns {boolean}
+ */
+export const isAuthenticated = () => {
+  return Boolean(getToken());
 };

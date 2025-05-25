@@ -9,7 +9,7 @@ from spacy.matcher import PhraseMatcher
 app = FastAPI(title="Kategori & Ürün NLP API")
 
 # Spacy modelini yükle
-nlp = spacy.load("tr_core_news_sm")  # Türkçe model
+nlp = spacy.load("tr_core_news_lg")  # Türkçe model
 
 # Örnek kategori ve ürün listesi
 data = {
