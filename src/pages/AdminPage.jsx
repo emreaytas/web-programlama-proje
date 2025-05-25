@@ -96,7 +96,6 @@ const AdminPage = () => {
                 >
                   Sil
                 </button>
-                {/* Düzenleme butonu burada geliştirilebilir */}
               </td>
             </tr>
           ))}

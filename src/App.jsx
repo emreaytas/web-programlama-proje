@@ -4,9 +4,7 @@ import Home from './pages/Home';
 import AdminPage from './pages/AdminPage';
 import LoginPage from "./pages/LoginPage";
 
-function AppContent() {
-  const location = useLocation();
-  const hideNavbar = location.pathname.startsWith("/admin");
+
 
   return (
     <>
@@ -24,6 +22,7 @@ function App() {
   return (
     <Router>
       <AppContent />
+
     </Router>
   );
 }
