@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import sampleProducts from "../data/sampleProducts";
+import { useNavigate } from "react-router-dom";
+import { getToken } from "../utils/tokenUtils";
 
 const AdminPage = () => {
   const [products, setProducts] = useState(sampleProducts);
@@ -8,8 +10,17 @@ const AdminPage = () => {
     description: "",
     price: "",
     sold: 0,
-    image: ""
+    image: "",
   });
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = getToken();
+    if (!token) {
+      navigate("/login");
+    }
+  }, []);
 
   // Ürün ekleme
   const handleAddProduct = () => {
@@ -17,7 +28,7 @@ const AdminPage = () => {
       ...newProduct,
       id: products.length + 1,
       price: parseFloat(newProduct.price),
-      sold: parseInt(newProduct.sold)
+      sold: parseInt(newProduct.sold),
     };
     setProducts([newItem, ...products]);
     setNewProduct({ name: "", description: "", price: "", sold: 0, image: "" });
@@ -43,7 +54,9 @@ const AdminPage = () => {
                 className="form-control"
                 placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
                 value={newProduct[field]}
-                onChange={(e) => setNewProduct({ ...newProduct, [field]: e.target.value })}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, [field]: e.target.value })
+                }
               />
             </div>
           ))}
@@ -77,7 +90,10 @@ const AdminPage = () => {
               <td>{p.price} ₺</td>
               <td>{p.sold}</td>
               <td>
-                <button className="btn btn-sm btn-danger" onClick={() => handleDelete(p.id)}>
+                <button
+                  className="btn btn-sm btn-danger"
+                  onClick={() => handleDelete(p.id)}
+                >
                   Sil
                 </button>
               </td>
