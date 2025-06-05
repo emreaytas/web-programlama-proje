@@ -167,11 +167,7 @@ namespace webprogbackend.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var systemPrompt = @"You are an expert e-commerce product recommendation assistant. 
-                Based on user needs, recommend suitable product categories and provide helpful shopping advice.
-                Focus on the categories available in our store: Bilgisayar, Telefon, Ses, Tablet, Giyilebilir, Depolama.
-                Provide specific, actionable recommendations in Turkish.
-                Keep responses concise and helpful.";
+                var systemPrompt = @"Sen bir e ticaret sitesi yardımcı asistanısın ona göre davran tamam mı?";
 
                 var deepSeekRequest = new
                 {
