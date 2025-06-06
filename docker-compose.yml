@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./web2backEmre
+      dockerfile: Dockerfile
+    ports:
+      - "7062:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/dev-cert.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=YourStrong!Passw0rd
+      - ConnectionStrings__DefaultConnection=Server=db;Database=WebProgDB;User=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True
+    volumes:
+      - ./web2backEmre/https:/https:ro
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./webprogramlamafront
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=https://localhost:7062
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+    depends_on:
+      - backend
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong!Passw0rd
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqldata:/var/opt/mssql
+
+volumes:
+  sqldata:
