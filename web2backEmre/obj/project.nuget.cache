@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "gkLdoTsgf5A=",
+  "dgSpecHash": "vE4YQV0XZRw=",
   "success": true,
-  "projectFilePath": "C:\\Users\\emrea\\Source\\Repos\\webprogbackEmre\\webprogbackend.csproj",
+  "projectFilePath": "C:\\Users\\emrea\\Desktop\\w33\\web-programlama-proje\\web2backEmre\\webprogbackend.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\emrea\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\emrea\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",
