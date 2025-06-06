@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("webprogbackend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0a4f4ebf03866a682ac8f1bfb65a7b399e979421")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7a4cac693512a6d8a07f11dcdcc1729181f44b9f")]
 [assembly: System.Reflection.AssemblyProductAttribute("webprogbackend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("webprogbackend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
