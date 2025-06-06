@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\emrea\\Source\\Repos\\webprogbackEmre\\webprogbackend.csproj": {}
+    "C:\\Users\\emrea\\Desktop\\w33\\web-programlama-proje\\web2backEmre\\webprogbackend.csproj": {}
   },
   "projects": {
-    "C:\\Users\\emrea\\Source\\Repos\\webprogbackEmre\\webprogbackend.csproj": {
+    "C:\\Users\\emrea\\Desktop\\w33\\web-programlama-proje\\web2backEmre\\webprogbackend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\emrea\\Source\\Repos\\webprogbackEmre\\webprogbackend.csproj",
+        "projectUniqueName": "C:\\Users\\emrea\\Desktop\\w33\\web-programlama-proje\\web2backEmre\\webprogbackend.csproj",
         "projectName": "webprogbackend",
-        "projectPath": "C:\\Users\\emrea\\Source\\Repos\\webprogbackEmre\\webprogbackend.csproj",
+        "projectPath": "C:\\Users\\emrea\\Desktop\\w33\\web-programlama-proje\\web2backEmre\\webprogbackend.csproj",
         "packagesPath": "C:\\Users\\emrea\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\emrea\\Source\\Repos\\webprogbackEmre\\obj\\",
+        "outputPath": "C:\\Users\\emrea\\Desktop\\w33\\web-programlama-proje\\web2backEmre\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
